@@ -18,10 +18,13 @@ const GraphQL = {
             }
 
             // Get auth headers
-            const headers = Auth.getAuthHeaders();
+            const headers = {
+                ...Auth.getAuthHeaders(),
+                ...CONFIG.getProxyHeaders()
+            };
 
-            // Make the request
-            const response = await fetch(CONFIG.GRAPHQL_ENDPOINT, {
+            // Make the request (with CORS proxy if enabled)
+            const response = await fetch(CONFIG.getGraphQLEndpoint(), {
                 method: 'POST',
                 headers: headers,
                 body: JSON.stringify({

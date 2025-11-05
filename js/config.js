@@ -14,7 +14,16 @@ const CONFIG = {
         USER_ID: 'user_id',
         USERNAME: 'username'
     },
-    
+  
+    USE_CORS_PROXY: typeof window !== 'undefined'
+        ? window.location.origin !== 'https://platform.zone01.gr'
+        : false,  // Automatically enable proxy outside the platform origin
+    CORS_PROXY: 'https://proxy.cors.sh/',  // Free proxy that supports Authorization headers
+    CORS_PROXY_ENCODE_URI: false,
+    CORS_PROXY_HEADERS: {
+        'x-cors-api-key': 'temp_d0e245c728137f6bcc9d7f3cd30b63d9',
+    },
+
     // Authentication
     AUTH_HEADER_PREFIX: 'Bearer',
     
@@ -27,6 +36,49 @@ const CONFIG = {
     // UI Settings
     ANIMATION_DURATION: 400, // milliseconds
     TOAST_DURATION: 3000, // milliseconds for notifications
+
+    /**
+     * Apply optional CORS proxy to an endpoint when enabled
+     * @param {string} endpoint - Base endpoint URL
+     * @returns {string} Endpoint with proxy applied if configured
+     */
+    applyProxy(endpoint) {
+        if (this.USE_CORS_PROXY && this.CORS_PROXY) {
+            if (this.CORS_PROXY_ENCODE_URI) {
+                const encodedEndpoint = encodeURIComponent(endpoint);
+                return `${this.CORS_PROXY}${encodedEndpoint}`;
+            }
+            return `${this.CORS_PROXY}${endpoint}`;
+        }
+        return endpoint;
+    },
+
+    /**
+     * Get the signin endpoint respecting proxy settings
+     * @returns {string} Signin endpoint URL
+     */
+    getSigninEndpoint() {
+        return this.applyProxy(this.SIGNIN_ENDPOINT);
+    },
+
+    /**
+     * Get the GraphQL endpoint respecting proxy settings
+     * @returns {string} GraphQL endpoint URL
+     */
+    getGraphQLEndpoint() {
+        return this.applyProxy(this.GRAPHQL_ENDPOINT);
+    },
+
+    /**
+     * Get additional headers needed when using a proxy
+     * @returns {object} Proxy specific headers
+     */
+    getProxyHeaders() {
+        if (this.USE_CORS_PROXY && this.CORS_PROXY_HEADERS) {
+            return this.CORS_PROXY_HEADERS;
+        }
+        return {};
+    }
 };
 
 // Freeze the config to prevent modifications

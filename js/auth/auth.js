@@ -15,13 +15,21 @@ const Auth = {
             // Create Basic Auth credentials
             const credentials = btoa(`${identifier}:${password}`);
             
-            // Make POST request to signin endpoint
-            const response = await fetch(CONFIG.SIGNIN_ENDPOINT, {
+            // Make POST request to signin endpoint (with CORS proxy if enabled)
+            const headers = {
+                'Authorization': `Basic ${credentials}`,
+                'Content-Type': 'application/json',
+                ...CONFIG.getProxyHeaders()
+            };
+
+            // Some proxies require passing original headers through a meta-header
+            if (CONFIG.USE_CORS_PROXY && CONFIG.CORS_PROXY_HEADERS && CONFIG.CORS_PROXY_HEADERS['X-Cors-Headers']) {
+                headers['X-Cors-Headers'] = CONFIG.CORS_PROXY_HEADERS['X-Cors-Headers'];
+            }
+
+            const response = await fetch(CONFIG.getSigninEndpoint(), {
                 method: 'POST',
-                headers: {
-                    'Authorization': `Basic ${credentials}`,
-                    'Content-Type': 'application/json'
-                }
+                headers
             });
 
             // Check if response is ok

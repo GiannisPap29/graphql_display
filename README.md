@@ -34,10 +34,10 @@ A dynamic, interactive profile page that visualizes your Zone01 learning journey
 
    ```bash
    # Python 3
-   python -m http.server 8000
+   python3 -m http.server 8000
 
    # Python 2
-   python -m SimpleHTTPServer 8000
+   python3 -m SimpleHTTPServer 8000
    ```
 
    Using Node.js (http-server):
@@ -164,6 +164,17 @@ graphql-profile/
 - **Authentication**: JWT (JSON Web Tokens)
 
 ## 🐛 Troubleshooting
+
+### CORS Issues (Local Development)
+
+**Problem**: "CORS policy" error when logging in
+
+- **Solution**: The project is pre-configured with a CORS proxy for development
+- The proxy is **automatically enabled** in `js/config.js`
+- Just refresh your browser (Ctrl+Shift+R) after starting the server
+- **See CORS_SOLUTION.md** for detailed information and alternatives
+
+**For Production**: Disable the proxy by setting `USE_CORS_PROXY: false` in `js/config.js`
 
 ### Login Issues
 
