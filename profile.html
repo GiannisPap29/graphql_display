@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - Zone01</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/graphs.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="profile-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h2>Zone01 Profile</h2>
+                </div>
+                <nav class="nav-menu">
+                    <button id="logoutBtn" class="logout-btn">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                            <polyline points="16 17 21 12 16 7"></polyline>
+                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                        </svg>
+                        Logout
+                    </button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="profile-main">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="loader"></div>
+                <p>Loading your profile...</p>
+            </div>
+
+            <!-- Error State -->
+            <div id="errorState" class="error-state" style="display: none;">
+                <div class="error-icon">⚠️</div>
+                <h3>Failed to Load Profile</h3>
+                <p id="errorMessage">An error occurred while loading your profile.</p>
+                <button id="retryBtn" class="retry-btn">Retry</button>
+            </div>
+
+            <!-- Profile Content -->
+            <div id="profileContent" class="profile-content" style="display: none;">
+                
+                <!-- User Info Section -->
+                <section class="profile-section">
+                    <div class="section-header">
+                        <h2>Profile Information</h2>
+                    </div>
+                    <div class="user-info-grid" id="userInfoGrid">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Statistics Cards -->
+                <section class="profile-section">
+                    <div class="section-header">
+                        <h2>Quick Stats</h2>
+                    </div>
+                    <div class="stats-grid" id="statsGrid">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </section>
+
+                <!-- Graphs Section -->
+                <section class="profile-section">
+                    <div class="section-header">
+                        <h2>Statistics & Analytics</h2>
+                        <p class="section-description">Visual representation of your progress and achievements</p>
+                    </div>
+                    
+                    <div class="graphs-container">
+                        <!-- XP Timeline Graph -->
+                        <div class="graph-card">
+                            <div class="graph-header">
+                                <h3>XP Progress Over Time</h3>
+                                <p class="graph-subtitle">Cumulative XP earned throughout your journey</p>
+                            </div>
+                            <div class="graph-body" id="xpTimelineGraph">
+                                <div class="graph-loader">
+                                    <div class="loader"></div>
+                                    <p>Loading graph...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Audit Ratio Graph -->
+                        <div class="graph-card">
+                            <div class="graph-header">
+                                <h3>Audit Ratio</h3>
+                                <p class="graph-subtitle">Audits done vs audits received</p>
+                            </div>
+                            <div class="graph-body" id="auditRatioGraph">
+                                <div class="graph-loader">
+                                    <div class="loader"></div>
+                                    <p>Loading graph...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Stats Graph -->
+                        <div class="graph-card">
+                            <div class="graph-header">
+                                <h3>Project Success Rate</h3>
+                                <p class="graph-subtitle">Pass vs Fail ratio for all projects</p>
+                            </div>
+                            <div class="graph-body" id="projectStatsGraph">
+                                <div class="graph-loader">
+                                    <div class="loader"></div>
+                                    <p>Loading graph...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- XP by Project Graph -->
+                        <div class="graph-card">
+                            <div class="graph-header">
+                                <h3>XP Distribution by Project</h3>
+                                <p class="graph-subtitle">Top projects by XP earned</p>
+                            </div>
+                            <div class="graph-body" id="xpByProjectGraph">
+                                <div class="graph-loader">
+                                    <div class="loader"></div>
+                                    <p>Loading graph...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Additional Details Section -->
+                <section class="profile-section">
+                    <div class="section-header">
+                        <h2>Additional Information</h2>
+                    </div>
+                    <div class="details-grid" id="detailsGrid">
+                        <!-- Will be populated by JS -->
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="profile-footer">
+        <div class="container">
+            <p>&copy; 2024 Zone01. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Include all scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth/storage.js"></script>
+    <script src="js/auth/jwt.js"></script>
+    <script src="js/auth/auth.js"></script>
+    <script src="js/api/graphql.js"></script>
+    <script src="js/api/queries.js"></script>
+    <script src="js/utils/data-processor.js"></script>
+    <script src="js/utils/date-utils.js"></script>
+    <script src="js/components/profile-info.js"></script>
+    <script src="js/components/stats-card.js"></script>
+    <script src="js/components/logout.js"></script>
+    <script src="js/graphs/svg-builder.js"></script>
+    <script src="js/graphs/xp-timeline.js"></script>
+    <script src="js/graphs/audit-ratio.js"></script>
+    <script src="js/graphs/project-stats.js"></script>
+    <script src="js/graphs/xp-by-project.js"></script>
+
+    <script>
+        // Main Profile Page Logic
+        (async function() {
+            // Require authentication
+            Auth.requireAuth();
+
+            // Get DOM elements
+            const loadingState = document.getElementById('loadingState');
+            const errorState = document.getElementById('errorState');
+            const profileContent = document.getElementById('profileContent');
+            const errorMessage = document.getElementById('errorMessage');
+            const retryBtn = document.getElementById('retryBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+
+            // Initialize logout functionality
+            if (window.Logout) {
+                Logout.init();
+            }
+
+            /**
+             * Load all profile data
+             */
+            async function loadProfile() {
+                try {
+                    showLoading();
+
+                    // Get current user
+                    const currentUser = Auth.getCurrentUser();
+                    if (!currentUser) {
+                        throw new Error('User not authenticated');
+                    }
+
+                    console.log('Loading profile for user:', currentUser.userId);
+
+                    // Load user profile data
+                    const userResult = await GraphQL.query(Queries.getUserProfile);
+                    if (!userResult.success) {
+                        throw new Error(userResult.error);
+                    }
+
+                    const userData = userResult.data.user[0];
+                    console.log('User data loaded:', userData);
+
+                    // Render user info
+                    if (window.ProfileInfo) {
+                        ProfileInfo.render(userData);
+                    }
+
+                    // Load statistics
+                    await loadStatistics(currentUser.userId);
+
+                    // Load graphs
+                    await loadGraphs(currentUser.userId);
+
+                    // Show profile content
+                    showProfile();
+
+                } catch (error) {
+                    console.error('Error loading profile:', error);
+                    showError(error.message);
+                }
+            }
+
+            /**
+             * Load statistics data
+             */
+            async function loadStatistics(userId) {
+                try {
+                    // Load total XP
+                    const xpResult = await GraphQL.query(Queries.getTotalXP);
+                    
+                    // Load audit ratio
+                    const auditResult = await GraphQL.query(Queries.getAuditRatio, { userId });
+                    
+                    // Load pass/fail stats
+                    const passFailResult = await GraphQL.query(Queries.getPassFailStats, { userId });
+
+                    // Render stats cards
+                    if (window.StatsCard) {
+                        const stats = {
+                            totalXP: xpResult.data?.transaction_aggregate?.aggregate?.sum?.amount || 0,
+                            auditsDone: auditResult.data?.auditorAudits?.aggregate?.count || 0,
+                            auditsReceived: auditResult.data?.receivedAudits?.aggregate?.count || 0,
+                            projectsPassed: passFailResult.data?.passed?.aggregate?.count || 0,
+                            projectsFailed: passFailResult.data?.failed?.aggregate?.count || 0
+                        };
+
+                        StatsCard.renderAll(stats);
+                    }
+
+                } catch (error) {
+                    console.error('Error loading statistics:', error);
+                }
+            }
+
+            /**
+             * Load all graphs
+             */
+            async function loadGraphs(userId) {
+                try {
+                    // Load XP timeline
+                    if (window.XPTimeline) {
+                        const xpData = await GraphQL.query(Queries.getXPTransactions);
+                        if (xpData.success) {
+                            XPTimeline.render(xpData.data.transaction);
+                        }
+                    }
+
+                    // Load audit ratio
+                    if (window.AuditRatio) {
+                        const auditData = await GraphQL.query(Queries.getAuditRatio, { userId });
+                        if (auditData.success) {
+                            AuditRatio.render(auditData.data);
+                        }
+                    }
+
+                    // Load project stats
+                    if (window.ProjectStats) {
+                        const projectData = await GraphQL.query(Queries.getPassFailStats, { userId });
+                        if (projectData.success) {
+                            ProjectStats.render(projectData.data);
+                        }
+                    }
+
+                    // Load XP by project
+                    if (window.XPByProject) {
+                        const xpByProjectData = await GraphQL.query(Queries.getXPByProject);
+                        if (xpByProjectData.success) {
+                            XPByProject.render(xpByProjectData.data.transaction);
+                        }
+                    }
+
+                } catch (error) {
+                    console.error('Error loading graphs:', error);
+                }
+            }
+
+            /**
+             * Show loading state
+             */
+            function showLoading() {
+                loadingState.style.display = 'flex';
+                errorState.style.display = 'none';
+                profileContent.style.display = 'none';
+            }
+
+            /**
+             * Show error state
+             */
+            function showError(message) {
+                loadingState.style.display = 'none';
+                errorState.style.display = 'flex';
+                profileContent.style.display = 'none';
+                errorMessage.textContent = message;
+            }
+
+            /**
+             * Show profile content
+             */
+            function showProfile() {
+                loadingState.style.display = 'none';
+                errorState.style.display = 'none';
+                profileContent.style.display = 'block';
+            }
+
+            // Retry button
+            retryBtn.addEventListener('click', loadProfile);
+
+            // Initialize profile
+            loadProfile();
+
+        })();
+    </script>
+</body>
+</html>

@@ -22,10 +22,10 @@ const CONFIG = {
     TOKEN_EXPIRY_CHECK_INTERVAL: 60000, // Check token expiry every 60 seconds
     
     // GraphQL Settings
-    GRAPHQL_BATCH_SIZE: 100, // Max items per query
+    GRAPHQL_BATCH_SIZE: 200, // Max items per query
     
     // UI Settings
-    ANIMATION_DURATION: 300, // milliseconds
+    ANIMATION_DURATION: 400, // milliseconds
     TOAST_DURATION: 3000, // milliseconds for notifications
 };
 

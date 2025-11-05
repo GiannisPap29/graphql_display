@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GraphQL Profile - Zone01</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .loading-screen {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .loading-content {
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .loading-logo {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .loading-text {
+            font-size: 18px;
+            margin-bottom: 32px;
+            opacity: 0.9;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-dots {
+            display: inline-block;
+            animation: dots 1.5s infinite;
+        }
+
+        @keyframes dots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        .error-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .error-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 12px;
+            max-width: 500px;
+        }
+
+        .error-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+        }
+
+        .error-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .error-message {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 24px;
+        }
+
+        .error-button {
+            background: white;
+            color: #667eea;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+            transition: transform 0.2s ease;
+        }
+
+        .error-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <div class="loading-logo">Zone01 Profile</div>
+            <div class="loading-text">
+                Checking authentication<span class="loading-dots"></span>
+            </div>
+            <div class="loading-spinner"></div>
+        </div>
+    </div>
+
+    <!-- Include scripts in order -->
+    <script src="js/config.js"></script>
+    <script src="js/auth/storage.js"></script>
+    <script src="js/auth/jwt.js"></script>
+    <script src="js/auth/auth.js"></script>
+    
+    <script>
+        /**
+         * Main entry point - handles routing based on authentication status
+         */
+        (function() {
+            // Minimum loading time for better UX (prevents flash)
+            const MIN_LOADING_TIME = 500;
+            const startTime = Date.now();
+
+            /**
+             * Redirect user based on authentication status
+             */
+            function handleRedirect() {
+                try {
+                    // Check if user is authenticated
+                    if (Auth.isAuthenticated()) {
+                        // User is logged in - redirect to profile
+                        const userData = Auth.getCurrentUser();
+                        console.log('User authenticated:', userData.username);
+                        redirectTo('profile.html');
+                    } else {
+                        // User is not logged in - redirect to login
+                        console.log('User not authenticated, redirecting to login');
+                        redirectTo('login.html');
+                    }
+                } catch (error) {
+                    console.error('Error during authentication check:', error);
+                    showError('An error occurred. Please try again.', 'login.html');
+                }
+            }
+
+            /**
+             * Redirect to specified page after minimum loading time
+             * @param {string} url - URL to redirect to
+             */
+            function redirectTo(url) {
+                const elapsed = Date.now() - startTime;
+                const remainingTime = Math.max(0, MIN_LOADING_TIME - elapsed);
+
+                setTimeout(() => {
+                    window.location.href = url;
+                }, remainingTime);
+            }
+
+            /**
+             * Show error message with retry option
+             * @param {string} message - Error message to display
+             * @param {string} fallbackUrl - URL to redirect on retry
+             */
+            function showError(message, fallbackUrl = 'login.html') {
+                const loadingScreen = document.getElementById('loadingScreen');
+                
+                loadingScreen.innerHTML = `
+                    <div class="error-container">
+                        <div class="error-box">
+                            <div class="error-icon">⚠️</div>
+                            <div class="error-title">Oops! Something went wrong</div>
+                            <div class="error-message">${message}</div>
+                            <button class="error-button" onclick="window.location.href='${fallbackUrl}'">
+                                Continue to Login
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            /**
+             * Check if localStorage is available
+             * @returns {boolean} True if localStorage is available
+             */
+            function isLocalStorageAvailable() {
+                try {
+                    const test = '__localStorage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+
+            // Check localStorage availability
+            if (!isLocalStorageAvailable()) {
+                showError(
+                    'Your browser does not support localStorage or it is disabled. Please enable localStorage to use this application.',
+                    'login.html'
+                );
+                return;
+            }
+
+            // Initialize the redirect logic
+            handleRedirect();
+
+        })();
+    </script>
+</body>
+</html>

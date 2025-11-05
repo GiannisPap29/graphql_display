@@ -1,0 +1,359 @@
+/* Graph Styles */
+
+/* Graph Container */
+.graphs-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 32px;
+}
+
+/* Graph Card */
+.graph-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.graph-card:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+}
+
+/* Graph Header */
+.graph-header {
+    padding: 24px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f7fafc;
+}
+
+.graph-header h3 {
+    font-size: 20px;
+    margin-bottom: 4px;
+    color: #1a202c;
+}
+
+.graph-subtitle {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+}
+
+/* Graph Body */
+.graph-body {
+    padding: 24px;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Graph Loader */
+.graph-loader {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+}
+
+.graph-loader .loader {
+    width: 50px;
+    height: 50px;
+    border-width: 4px;
+}
+
+.graph-loader p {
+    color: #718096;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* SVG Styles */
+svg {
+    max-width: 100%;
+    height: auto;
+}
+
+svg text {
+    user-select: none;
+}
+
+/* XP Timeline Graph Specific */
+.xp-timeline-svg .point-hover circle:first-child {
+    transition: opacity 0.2s ease, r 0.2s ease;
+}
+
+.xp-timeline-svg .point-hover circle:last-child {
+    transition: r 0.2s ease;
+}
+
+/* Audit Ratio Graph Specific */
+.audit-ratio-svg .donut-segment {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.audit-ratio-svg .donut-segment:hover {
+    transform: scale(1.05);
+}
+
+/* Project Stats Graph Specific */
+.project-stats-svg .bar-rect {
+    transition: opacity 0.2s ease;
+}
+
+/* XP by Project Graph Specific */
+.xp-by-project-svg .xp-bar {
+    transition: opacity 0.2s ease;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 48px 24px;
+    color: #718096;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    color: #4a5568;
+    margin-bottom: 8px;
+    font-size: 18px;
+}
+
+.empty-state p {
+    font-size: 14px;
+    color: #718096;
+    margin: 0;
+}
+
+/* Tooltips */
+#svg-tooltip,
+#xp-tooltip,
+#audit-ratio-tooltip,
+#project-stats-tooltip,
+#xp-project-tooltip {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 10000;
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+#svg-tooltip > div,
+#xp-tooltip > div,
+#audit-ratio-tooltip > div,
+#project-stats-tooltip > div,
+#xp-project-tooltip > div {
+    line-height: 1.6;
+}
+
+/* Graph Animations */
+@keyframes drawLine {
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .graphs-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .graph-body {
+        min-height: 300px;
+        padding: 16px;
+    }
+
+    .graph-header {
+        padding: 16px;
+    }
+
+    .graph-header h3 {
+        font-size: 18px;
+    }
+
+    .graph-subtitle {
+        font-size: 13px;
+    }
+
+    .empty-state {
+        padding: 32px 16px;
+    }
+
+    .empty-state-icon {
+        font-size: 48px;
+    }
+
+    .empty-state h3 {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .graphs-container {
+        gap: 20px;
+    }
+
+    .graph-body {
+        padding: 12px;
+        min-height: 250px;
+    }
+
+    svg {
+        font-size: 10px;
+    }
+
+    #svg-tooltip,
+    #xp-tooltip,
+    #audit-ratio-tooltip,
+    #project-stats-tooltip,
+    #xp-project-tooltip {
+        font-size: 11px;
+        padding: 8px 12px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .graph-card {
+        box-shadow: none;
+        border: 1px solid #e2e8f0;
+        page-break-inside: avoid;
+    }
+
+    .graph-body {
+        min-height: auto;
+    }
+
+    #svg-tooltip,
+    #xp-tooltip,
+    #audit-ratio-tooltip,
+    #project-stats-tooltip,
+    #xp-project-tooltip {
+        display: none !important;
+    }
+}
+
+/* Dark Mode Support (Optional) */
+@media (prefers-color-scheme: dark) {
+    .graph-card {
+        background: #2d3748;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .graph-header {
+        background: #1a202c;
+        border-bottom-color: #4a5568;
+    }
+
+    .graph-header h3 {
+        color: #f7fafc;
+    }
+
+    .graph-subtitle {
+        color: #a0aec0;
+    }
+
+    .empty-state h3 {
+        color: #cbd5e0;
+    }
+
+    .empty-state p {
+        color: #a0aec0;
+    }
+
+    svg text {
+        fill: #e2e8f0 !important;
+    }
+
+    svg line[stroke="#e2e8f0"] {
+        stroke: #4a5568 !important;
+    }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+    .graph-card {
+        border: 2px solid #000;
+    }
+
+    svg text {
+        font-weight: bold;
+    }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    .graph-card {
+        transition: none;
+    }
+
+    svg * {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    #svg-tooltip,
+    #xp-tooltip,
+    #audit-ratio-tooltip,
+    #project-stats-tooltip,
+    #xp-project-tooltip {
+        transition: none;
+    }
+}
