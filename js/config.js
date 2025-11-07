@@ -15,9 +15,9 @@ const CONFIG = {
         USERNAME: 'username'
     },
   
-    USE_CORS_PROXY: true,  // Use local CORS proxy
-    CORS_PROXY: 'http://localhost:8080/',
-    CORS_PROXY_ENCODE_URI: false,
+    USE_CORS_PROXY: true,  // Use external CORS proxy
+    CORS_PROXY: 'https://corsproxy.io/?',
+    CORS_PROXY_ENCODE_URI: true,
     CORS_PROXY_HEADERS: {},
 
     // Authentication

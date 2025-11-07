@@ -1,140 +1,218 @@
 /**
- * Storage utility for managing authentication tokens and user data
- * Uses localStorage for persistent storage
+ * Storage Module - Cookie-based JWT Storage
+ * Uses cookies with Secure and SameSite flags for better security
+ * 
+ * Note: HttpOnly flag cannot be set from client-side JavaScript.
+ * For true HttpOnly security, you would need a backend server.
  */
 
 const Storage = {
     /**
-     * Save JWT token to localStorage
+     * Cookie configuration
+     */
+    COOKIE_CONFIG: {
+        JWT_TOKEN: 'zone01_jwt_token',
+        USER_ID: 'zone01_user_id',
+        USERNAME: 'zone01_username',
+        MAX_AGE: 86400, // 24 hours in seconds
+        PATH: '/',
+        SECURE: window.location.protocol === 'https:', // Only true on HTTPS
+        SAMESITE: 'Strict' // CSRF protection
+    },
+
+    /**
+     * Set a cookie with security flags
+     * @param {string} name - Cookie name
+     * @param {string} value - Cookie value
+     * @param {number} maxAge - Max age in seconds (optional)
+     */
+    setCookie(name, value, maxAge = this.COOKIE_CONFIG.MAX_AGE) {
+        try {
+            let cookie = `${encodeURIComponent(name)}=${encodeURIComponent(value)}`;
+            cookie += `; max-age=${maxAge}`;
+            cookie += `; path=${this.COOKIE_CONFIG.PATH}`;
+            cookie += `; SameSite=${this.COOKIE_CONFIG.SAMESITE}`;
+            
+            // Only set Secure flag on HTTPS
+            if (this.COOKIE_CONFIG.SECURE) {
+                cookie += '; Secure';
+            }
+
+            document.cookie = cookie;
+            return true;
+        } catch (error) {
+            console.error('Error setting cookie:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Get a cookie value
+     * @param {string} name - Cookie name
+     * @returns {string|null} Cookie value or null
+     */
+    getCookie(name) {
+        try {
+            const nameEQ = encodeURIComponent(name) + '=';
+            const cookies = document.cookie.split(';');
+            
+            for (let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(cookie.substring(nameEQ.length));
+                }
+            }
+            return null;
+        } catch (error) {
+            console.error('Error getting cookie:', error);
+            return null;
+        }
+    },
+
+    /**
+     * Delete a cookie
+     * @param {string} name - Cookie name
+     */
+    deleteCookie(name) {
+        try {
+            // Set expiration to past date
+            document.cookie = `${encodeURIComponent(name)}=; max-age=0; path=${this.COOKIE_CONFIG.PATH}`;
+            return true;
+        } catch (error) {
+            console.error('Error deleting cookie:', error);
+            return false;
+        }
+    },
+
+    /**
+     * Save JWT token to cookie
      * @param {string} token - JWT token
      */
     saveToken(token) {
-        try {
-            localStorage.setItem(CONFIG.STORAGE_KEYS.JWT_TOKEN, token);
-            return true;
-        } catch (error) {
-            console.error('Error saving token:', error);
-            return false;
-        }
+        return this.setCookie(this.COOKIE_CONFIG.JWT_TOKEN, token);
     },
 
     /**
-     * Get JWT token from localStorage
-     * @returns {string|null} JWT token or null if not found
+     * Get JWT token from cookie
+     * @returns {string|null} JWT token or null
      */
     getToken() {
-        try {
-            return localStorage.getItem(CONFIG.STORAGE_KEYS.JWT_TOKEN);
-        } catch (error) {
-            console.error('Error getting token:', error);
-            return null;
-        }
+        return this.getCookie(this.COOKIE_CONFIG.JWT_TOKEN);
     },
 
     /**
-     * Remove JWT token from localStorage
+     * Remove JWT token cookie
      */
     removeToken() {
-        try {
-            localStorage.removeItem(CONFIG.STORAGE_KEYS.JWT_TOKEN);
-            return true;
-        } catch (error) {
-            console.error('Error removing token:', error);
-            return false;
-        }
+        return this.deleteCookie(this.COOKIE_CONFIG.JWT_TOKEN);
     },
 
     /**
-     * Save user ID to localStorage
+     * Save user ID to cookie
      * @param {number} userId - User ID
      */
     saveUserId(userId) {
-        try {
-            localStorage.setItem(CONFIG.STORAGE_KEYS.USER_ID, userId.toString());
-            return true;
-        } catch (error) {
-            console.error('Error saving user ID:', error);
-            return false;
-        }
+        return this.setCookie(this.COOKIE_CONFIG.USER_ID, userId.toString());
     },
 
     /**
-     * Get user ID from localStorage
-     * @returns {number|null} User ID or null if not found
+     * Get user ID from cookie
+     * @returns {number|null} User ID or null
      */
     getUserId() {
-        try {
-            const userId = localStorage.getItem(CONFIG.STORAGE_KEYS.USER_ID);
-            return userId ? parseInt(userId, 10) : null;
-        } catch (error) {
-            console.error('Error getting user ID:', error);
-            return null;
-        }
+        const userId = this.getCookie(this.COOKIE_CONFIG.USER_ID);
+        return userId ? parseInt(userId, 10) : null;
     },
 
     /**
-     * Save username to localStorage
+     * Save username to cookie
      * @param {string} username - Username
      */
     saveUsername(username) {
-        try {
-            localStorage.setItem(CONFIG.STORAGE_KEYS.USERNAME, username);
-            return true;
-        } catch (error) {
-            console.error('Error saving username:', error);
-            return false;
-        }
+        return this.setCookie(this.COOKIE_CONFIG.USERNAME, username);
     },
 
     /**
-     * Get username from localStorage
-     * @returns {string|null} Username or null if not found
+     * Get username from cookie
+     * @returns {string|null} Username or null
      */
     getUsername() {
-        try {
-            return localStorage.getItem(CONFIG.STORAGE_KEYS.USERNAME);
-        } catch (error) {
-            console.error('Error getting username:', error);
-            return null;
-        }
+        return this.getCookie(this.COOKIE_CONFIG.USERNAME);
     },
 
     /**
-     * Clear all authentication data from localStorage
+     * Clear all authentication cookies
      */
-    clearAll() {
+    clear() {
         try {
-            localStorage.removeItem(CONFIG.STORAGE_KEYS.JWT_TOKEN);
-            localStorage.removeItem(CONFIG.STORAGE_KEYS.USER_ID);
-            localStorage.removeItem(CONFIG.STORAGE_KEYS.USERNAME);
+            this.removeToken();
+            this.deleteCookie(this.COOKIE_CONFIG.USER_ID);
+            this.deleteCookie(this.COOKIE_CONFIG.USERNAME);
             return true;
         } catch (error) {
-            console.error('Error clearing storage:', error);
+            console.error('Error clearing cookies:', error);
             return false;
         }
     },
 
     /**
-     * Check if user is authenticated (has valid token)
-     * @returns {boolean} True if token exists, false otherwise
+     * Check if user is authenticated (has valid token cookie)
+     * @returns {boolean} True if token exists
      */
     isAuthenticated() {
         const token = this.getToken();
-        return token !== null && token !== '';
+        return !!token;
     },
 
     /**
-     * Get all stored authentication data
-     * @returns {object} Object containing all auth data
+     * Migration utility: Move data from localStorage to cookies
+     * Call this once to migrate existing users
      */
-    getAllAuthData() {
-        return {
-            token: this.getToken(),
-            userId: this.getUserId(),
-            username: this.getUsername()
-        };
+    migrateFromLocalStorage() {
+        try {
+            // Check if localStorage has old data
+            const oldToken = localStorage.getItem('jwt_token');
+            const oldUserId = localStorage.getItem('user_id');
+            const oldUsername = localStorage.getItem('username');
+
+            if (oldToken) {
+                this.saveToken(oldToken);
+                console.log('✅ Migrated JWT token to cookie');
+            }
+
+            if (oldUserId) {
+                this.saveUserId(parseInt(oldUserId, 10));
+                console.log('✅ Migrated user ID to cookie');
+            }
+
+            if (oldUsername) {
+                this.saveUsername(oldUsername);
+                console.log('✅ Migrated username to cookie');
+            }
+
+            // Clean up localStorage
+            if (oldToken || oldUserId || oldUsername) {
+                localStorage.removeItem('jwt_token');
+                localStorage.removeItem('user_id');
+                localStorage.removeItem('username');
+                console.log('✅ Cleaned up localStorage');
+            }
+
+            return true;
+        } catch (error) {
+            console.error('Error migrating from localStorage:', error);
+            return false;
+        }
     }
 };
 
-// Freeze the Storage object to prevent modifications
+// Auto-migrate on first load (only runs once if localStorage has data)
+if (typeof window !== 'undefined') {
+    Storage.migrateFromLocalStorage();
+}
+
+// Expose to window
+window.Storage = Storage;
+
+// Freeze the Storage object
 Object.freeze(Storage);
