@@ -286,17 +286,24 @@ const XPTimeline = {
      * @param {SVGElement} area - Area element
      */
     animateGraph(line, area) {
-        // Animate line
-        const lineLength = line.getTotalLength();
-        line.style.strokeDasharray = lineLength;
-        line.style.strokeDashoffset = lineLength;
-        line.style.animation = 'drawLine 1.5s ease-in-out forwards';
+        // Wait for next frame to ensure SVG is rendered
+        requestAnimationFrame(() => {
+            try {
+                // Animate line
+                const lineLength = line.getTotalLength();
+                line.style.strokeDasharray = lineLength;
+                line.style.strokeDashoffset = lineLength;
+                line.style.animation = 'drawLine 1.5s ease-in-out forwards';
 
-        // Animate area
-        if (area) {
-            area.style.opacity = '0';
-            area.style.animation = 'fadeIn 1s ease-in-out 0.5s forwards';
-        }
+                // Animate area
+                if (area) {
+                    area.style.opacity = '0';
+                    area.style.animation = 'fadeIn 1s ease-in-out 0.5s forwards';
+                }
+            } catch (error) {
+                console.warn('Animation skipped:', error.message);
+            }
+        });
 
         // Add keyframes if not already added
         if (!document.getElementById('xp-timeline-animations')) {
@@ -358,13 +365,16 @@ const XPTimeline = {
     showEmptyState(container) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📊</div>
+                <div class="empty-state-icon">ðŸ“Š</div>
                 <h3>No XP Data Available</h3>
                 <p>Start completing projects to see your XP progress over time!</p>
             </div>
         `;
     }
 };
+
+// Expose to window
+window.XPTimeline = XPTimeline;
 
 // Freeze the XPTimeline object
 Object.freeze(XPTimeline);

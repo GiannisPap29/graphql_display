@@ -1,0 +1,43 @@
+.
+├── assets
+│   ├── fonts
+│   └── images
+│       └── favicon.png
+├── css
+│   ├── graphs.css
+│   ├── login.css
+│   ├── profile.css
+│   └── style.css
+├── DOCS
+│   ├── cors_solutions.md
+│   └── project_summary.md
+├── index.html
+├── js
+│   ├── api
+│   │   ├── graphql.js
+│   │   └── queries.js
+│   ├── auth
+│   │   ├── auth.js
+│   │   ├── jwt.js
+│   │   └── storage.js
+│   ├── components
+│   │   ├── logout.js
+│   │   ├── profile-info.js
+│   │   └── stats-card.js
+│   ├── config.js
+│   ├── graphs
+│   │   ├── audit-ratio.js
+│   │   ├── project-stats.js
+│   │   ├── svg-builder.js
+│   │   ├── xp-by-project.js
+│   │   └── xp-timeline.js
+│   └── utils
+│       ├── data-processor.js
+│       ├── date-utils.js
+│       └── validators.js
+├── login.html
+├── profile.html
+├── project_structure.txt
+└── README.md
+
+12 directories, 29 files

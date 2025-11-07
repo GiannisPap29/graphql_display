@@ -431,13 +431,16 @@ const ProjectStats = {
     showEmptyState(container) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📁</div>
+                <div class="empty-state-icon">ðŸ“</div>
                 <h3>No Project Data Available</h3>
                 <p>Complete projects to see your success statistics!</p>
             </div>
         `;
     }
 };
+
+// Expose to window
+window.ProjectStats = ProjectStats;
 
 // Freeze the ProjectStats object
 Object.freeze(ProjectStats);

@@ -58,16 +58,40 @@ const Auth = {
                 }
             }
 
-            // Parse the JSON response to get the JWT token
-            const data = await response.json();
+            // Get the response as text first
+            const responseText = await response.text();
             
-            // The token might be in different fields depending on the API response
-            const token = data.token || data.jwt || data.access_token;
+            // Debug: Log the raw response
+            console.log('Raw auth response:', responseText);
             
-            if (!token) {
+            let token = responseText.trim();
+            
+            // Try to extract JWT from various response formats
+            // JWT tokens always start with "eyJ" (base64 encoded {"alg":...)
+            const jwtRegex = /eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/;
+            const jwtMatch = responseText.match(jwtRegex);
+            
+            if (jwtMatch) {
+                // Found a JWT pattern in the response
+                token = jwtMatch[0];
+                console.log('Extracted JWT token:', token.substring(0, 50) + '...');
+            } else if (responseText.startsWith('{')) {
+                // Response is JSON, try to parse it
+                try {
+                    const data = JSON.parse(responseText);
+                    token = data.token || data.jwt || data.access_token || responseText.trim();
+                } catch (e) {
+                    console.error('Failed to parse JSON response:', e);
+                    token = responseText.trim();
+                }
+            }
+            
+            // Final validation - ensure token looks like a JWT
+            if (!token || !token.includes('.') || !token.startsWith('eyJ')) {
+                console.error('Invalid token format received:', token);
                 return {
                     success: false,
-                    error: 'No token received from server.'
+                    error: 'Received invalid token format from server. Try using a browser CORS extension.'
                 };
             }
 

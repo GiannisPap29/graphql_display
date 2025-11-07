@@ -93,17 +93,16 @@ const ProfileInfo = {
      */
     createInfoCard(cardData) {
         const card = document.createElement('div');
-        card.className = 'user-info-card';
+        card.className = 'info-card';
         
         card.innerHTML = `
             <div class="info-icon">${cardData.icon}</div>
-            <div class="info-label">${cardData.label}</div>
-            <div class="info-value">${cardData.value}</div>
+            <div class="info-content">
+                <div class="info-label">${cardData.label}</div>
+                <div class="info-value">${cardData.value}</div>
+            </div>
         `;
-
-        // Add animation
-        card.style.animation = 'fadeIn 0.5s ease';
-
+        
         return card;
     },
 
@@ -115,70 +114,16 @@ const ProfileInfo = {
     formatDate(dateString) {
         try {
             const date = new Date(dateString);
-            const options = { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            };
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
             return date.toLocaleDateString('en-US', options);
         } catch (e) {
-            console.warn('Error formatting date:', e);
             return dateString;
         }
-    },
-
-    /**
-     * Update a specific info value
-     * @param {string} label - Label to update
-     * @param {string} value - New value
-     */
-    updateInfo(label, value) {
-        const container = document.getElementById('userInfoGrid');
-        if (!container) return;
-
-        const cards = container.querySelectorAll('.user-info-card');
-        cards.forEach(card => {
-            const cardLabel = card.querySelector('.info-label');
-            if (cardLabel && cardLabel.textContent === label) {
-                const valueElement = card.querySelector('.info-value');
-                if (valueElement) {
-                    valueElement.textContent = value;
-                }
-            }
-        });
-    },
-
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        const container = document.getElementById('userInfoGrid');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="loading-placeholder">
-                <div class="loader"></div>
-                <p>Loading user information...</p>
-            </div>
-        `;
-    },
-
-    /**
-     * Show error state
-     * @param {string} message - Error message
-     */
-    showError(message) {
-        const container = document.getElementById('userInfoGrid');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="error-placeholder">
-                <div class="error-icon">⚠️</div>
-                <p>${message}</p>
-            </div>
-        `;
     }
 };
+
+// Expose to window
+window.ProfileInfo = ProfileInfo;
 
 // Freeze the ProfileInfo object
 Object.freeze(ProfileInfo);

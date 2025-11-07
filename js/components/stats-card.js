@@ -82,22 +82,23 @@ const StatsCard = {
      * @param {number} index - Card index for animation delay
      * @returns {HTMLElement} Card element
      */
-    createCard(cardData, index = 0) {
+    createCard(cardData, index) {
         const card = document.createElement('div');
-        card.className = 'stat-card';
+        card.className = `stat-card stat-card-${cardData.iconType}`;
+        card.style.animationDelay = `${index * 0.1}s`;
         
-        // Add animation delay
-        card.style.animation = `fadeIn 0.5s ease ${index * 0.1}s backwards`;
-
         card.innerHTML = `
-            <div class="stat-icon ${cardData.iconType}">
-                ${cardData.icon}
+            <div class="stat-icon-container">
+                <div class="stat-icon-bg"></div>
+                <div class="stat-icon">${cardData.icon || '📈'}</div>
             </div>
-            <div class="stat-label">${cardData.label}</div>
-            <div class="stat-value">${cardData.value}</div>
-            <div class="stat-subtitle">${cardData.subtitle}</div>
+            <div class="stat-content">
+                <div class="stat-label">${cardData.label}</div>
+                <div class="stat-value">${cardData.value}</div>
+                <div class="stat-subtitle">${cardData.subtitle}</div>
+            </div>
         `;
-
+        
         return card;
     },
 
@@ -107,129 +108,131 @@ const StatsCard = {
      * @returns {string} Formatted number
      */
     formatNumber(num) {
-        if (num === null || num === undefined) return '0';
         return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-    },
-
-    /**
-     * Update a specific stat card
-     * @param {string} label - Card label to update
-     * @param {string|number} value - New value
-     */
-    updateCard(label, value) {
-        const container = document.getElementById('statsGrid');
-        if (!container) return;
-
-        const cards = container.querySelectorAll('.stat-card');
-        cards.forEach(card => {
-            const cardLabel = card.querySelector('.stat-label');
-            if (cardLabel && cardLabel.textContent === label) {
-                const valueElement = card.querySelector('.stat-value');
-                if (valueElement) {
-                    valueElement.textContent = this.formatNumber(value);
-                    
-                    // Add pulse animation
-                    card.classList.add('pulse');
-                    setTimeout(() => card.classList.remove('pulse'), 500);
-                }
-            }
-        });
-    },
-
-    /**
-     * Create a custom stat card
-     * @param {object} cardData - Custom card data
-     * @returns {HTMLElement} Card element
-     */
-    createCustomCard(cardData) {
-        return this.createCard({
-            icon: cardData.icon || '📈',
-            iconType: cardData.iconType || 'primary',
-            label: cardData.label || 'Stat',
-            value: cardData.value || '0',
-            subtitle: cardData.subtitle || ''
-        });
-    },
-
-    /**
-     * Add a custom card to the grid
-     * @param {object} cardData - Custom card data
-     */
-    addCustomCard(cardData) {
-        const container = document.getElementById('statsGrid');
-        if (!container) return;
-
-        const card = this.createCustomCard(cardData);
-        container.appendChild(card);
-    },
-
-    /**
-     * Show loading state
-     */
-    showLoading() {
-        const container = document.getElementById('statsGrid');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="loading-placeholder" style="grid-column: 1 / -1;">
-                <div class="loader"></div>
-                <p>Loading statistics...</p>
-            </div>
-        `;
-    },
-
-    /**
-     * Show error state
-     * @param {string} message - Error message
-     */
-    showError(message) {
-        const container = document.getElementById('statsGrid');
-        if (!container) return;
-
-        container.innerHTML = `
-            <div class="error-placeholder" style="grid-column: 1 / -1;">
-                <div class="error-icon">⚠️</div>
-                <p>${message}</p>
-            </div>
-        `;
-    },
-
-    /**
-     * Calculate percentage
-     * @param {number} value - Current value
-     * @param {number} total - Total value
-     * @returns {string} Percentage string
-     */
-    calculatePercentage(value, total) {
-        if (total === 0) return '0.0';
-        return ((value / total) * 100).toFixed(1);
-    },
-
-    /**
-     * Format ratio
-     * @param {number} numerator - Top number
-     * @param {number} denominator - Bottom number
-     * @returns {string} Ratio string
-     */
-    formatRatio(numerator, denominator) {
-        if (denominator === 0) return '0.00';
-        return (numerator / denominator).toFixed(2);
     }
 };
 
-// Add pulse animation to CSS dynamically
+// Add styles dynamically
 const style = document.createElement('style');
 style.textContent = `
-    .stat-card.pulse {
-        animation: pulse 0.5s ease;
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        animation: slideUp 0.5s ease-out both;
+        display: flex;
+        gap: 20px;
+        align-items: center;
     }
-    
-    @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .stat-icon-container {
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    .stat-icon-bg {
+        position: absolute;
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        opacity: 0.1;
+    }
+
+    .stat-icon {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
+
+    .stat-content {
+        flex: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        font-weight: 600;
+        color: #718096;
+        margin-bottom: 8px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .stat-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #1a202c;
+        margin-bottom: 4px;
+    }
+
+    .stat-subtitle {
+        font-size: 13px;
+        color: #a0aec0;
+    }
+
+    .stat-card-primary .stat-icon-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .stat-card-success .stat-icon-bg {
+        background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+    }
+
+    .stat-card-info .stat-icon-bg {
+        background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+    }
+
+    .stat-card-warning .stat-icon-bg {
+        background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+    }
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+        .stat-card {
+            padding: 16px;
+            gap: 12px;
+        }
+
+        .stat-icon-bg,
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+        }
+
+        .stat-icon {
+            font-size: 24px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+        }
     }
 `;
 document.head.appendChild(style);
+
+// Expose to window
+window.StatsCard = StatsCard;
 
 // Freeze the StatsCard object
 Object.freeze(StatsCard);

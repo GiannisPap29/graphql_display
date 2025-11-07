@@ -131,7 +131,7 @@ const Logout = {
         toast.className = 'toast success';
         toast.innerHTML = `
             <div style="display: flex; align-items: center; gap: 12px;">
-                <span style="font-size: 24px;">✓</span>
+                <span style="font-size: 24px;">âœ“</span>
                 <span>Logged out successfully</span>
             </div>
         `;
@@ -145,8 +145,8 @@ const Logout = {
 };
 
 // Add logout modal styles dynamically
-const style = document.createElement('style');
-style.textContent = `
+const logoutStyle = document.createElement('style');
+logoutStyle.textContent = `
     .logout-modal-overlay {
         position: fixed;
         top: 0;
@@ -280,7 +280,7 @@ style.textContent = `
         }
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(logoutStyle);
 
 // Freeze the Logout object
 Object.freeze(Logout);

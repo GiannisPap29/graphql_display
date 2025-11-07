@@ -42,7 +42,7 @@
 
             <!-- Error State -->
             <div id="errorState" class="error-state" style="display: none;">
-                <div class="error-icon">⚠️</div>
+                <div class="error-icon">âš ï¸</div>
                 <h3>Failed to Load Profile</h3>
                 <p id="errorMessage">An error occurred while loading your profile.</p>
                 <button id="retryBtn" class="retry-btn">Retry</button>
@@ -244,14 +244,22 @@
              */
             async function loadStatistics(userId) {
                 try {
+                    console.log('Loading statistics for user:', userId);
+                    
                     // Load total XP
+                    console.log('Fetching total XP...');
                     const xpResult = await GraphQL.query(Queries.getTotalXP);
+                    console.log('XP result:', xpResult);
                     
                     // Load audit ratio
+                    console.log('Fetching audit ratio...');
                     const auditResult = await GraphQL.query(Queries.getAuditRatio, { userId });
+                    console.log('Audit result:', auditResult);
                     
                     // Load pass/fail stats
+                    console.log('Fetching pass/fail stats...');
                     const passFailResult = await GraphQL.query(Queries.getPassFailStats, { userId });
+                    console.log('Pass/fail result:', passFailResult);
 
                     // Render stats cards
                     if (window.StatsCard) {
@@ -263,6 +271,7 @@
                             projectsFailed: passFailResult.data?.failed?.aggregate?.count || 0
                         };
 
+                        console.log('Rendering stats:', stats);
                         StatsCard.renderAll(stats);
                     }
 
@@ -276,9 +285,13 @@
              */
             async function loadGraphs(userId) {
                 try {
+                    console.log('Loading graphs for user:', userId);
+                    
                     // Load XP timeline
                     if (window.XPTimeline) {
+                        console.log('Loading XP timeline...');
                         const xpData = await GraphQL.query(Queries.getXPTransactions);
+                        console.log('XP timeline data:', xpData);
                         if (xpData.success) {
                             XPTimeline.render(xpData.data.transaction);
                         }
@@ -286,7 +299,9 @@
 
                     // Load audit ratio
                     if (window.AuditRatio) {
+                        console.log('Loading audit ratio chart...');
                         const auditData = await GraphQL.query(Queries.getAuditRatio, { userId });
+                        console.log('Audit ratio data:', auditData);
                         if (auditData.success) {
                             AuditRatio.render(auditData.data);
                         }
@@ -294,7 +309,9 @@
 
                     // Load project stats
                     if (window.ProjectStats) {
+                        console.log('Loading project stats...');
                         const projectData = await GraphQL.query(Queries.getPassFailStats, { userId });
+                        console.log('Project stats data:', projectData);
                         if (projectData.success) {
                             ProjectStats.render(projectData.data);
                         }
@@ -302,11 +319,15 @@
 
                     // Load XP by project
                     if (window.XPByProject) {
+                        console.log('Loading XP by project...');
                         const xpByProjectData = await GraphQL.query(Queries.getXPByProject);
+                        console.log('XP by project data:', xpByProjectData);
                         if (xpByProjectData.success) {
                             XPByProject.render(xpByProjectData.data.transaction);
                         }
                     }
+
+                    console.log('All graphs loaded successfully');
 
                 } catch (error) {
                     console.error('Error loading graphs:', error);
@@ -343,6 +364,9 @@
 
             // Retry button
             retryBtn.addEventListener('click', loadProfile);
+
+            // Initialize logout functionality
+            Logout.init();
 
             // Initialize profile
             loadProfile();

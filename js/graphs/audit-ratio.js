@@ -217,13 +217,13 @@ const AuditRatio = {
         let statusColor = '';
 
         if (parseFloat(ratio) >= 1) {
-            statusText = '✓ Good Ratio';
+            statusText = 'âœ“ Good Ratio';
             statusColor = '#48bb78';
         } else if (parseFloat(ratio) >= 0.5) {
-            statusText = '⚠ Average Ratio';
+            statusText = 'âš  Average Ratio';
             statusColor = '#ed8936';
         } else {
-            statusText = '⚠ Low Ratio';
+            statusText = 'âš  Low Ratio';
             statusColor = '#f56565';
         }
 
@@ -357,13 +357,16 @@ const AuditRatio = {
     showEmptyState(container) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">👥</div>
+                <div class="empty-state-icon">ðŸ‘¥</div>
                 <h3>No Audit Data Available</h3>
                 <p>Complete audits to see your audit ratio!</p>
             </div>
         `;
     }
 };
+
+// Expose to window
+window.AuditRatio = AuditRatio;
 
 // Freeze the AuditRatio object
 Object.freeze(AuditRatio);

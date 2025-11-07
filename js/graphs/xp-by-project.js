@@ -320,13 +320,16 @@ const XPByProject = {
     showEmptyState(container) {
         container.innerHTML = `
             <div class="empty-state">
-                <div class="empty-state-icon">📊</div>
+                <div class="empty-state-icon">ðŸ“Š</div>
                 <h3>No Project Data Available</h3>
                 <p>Complete projects to see XP distribution!</p>
             </div>
         `;
     }
 };
+
+// Expose to window
+window.XPByProject = XPByProject;
 
 // Freeze the XPByProject object
 Object.freeze(XPByProject);

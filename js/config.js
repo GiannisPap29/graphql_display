@@ -15,14 +15,10 @@ const CONFIG = {
         USERNAME: 'username'
     },
   
-    USE_CORS_PROXY: typeof window !== 'undefined'
-        ? window.location.origin !== 'https://platform.zone01.gr'
-        : false,  // Automatically enable proxy outside the platform origin
-    CORS_PROXY: 'https://proxy.cors.sh/',  // Free proxy that supports Authorization headers
+    USE_CORS_PROXY: true,  // Use local CORS proxy
+    CORS_PROXY: 'http://localhost:8080/',
     CORS_PROXY_ENCODE_URI: false,
-    CORS_PROXY_HEADERS: {
-        'x-cors-api-key': 'temp_d0e245c728137f6bcc9d7f3cd30b63d9',
-    },
+    CORS_PROXY_HEADERS: {},
 
     // Authentication
     AUTH_HEADER_PREFIX: 'Bearer',
