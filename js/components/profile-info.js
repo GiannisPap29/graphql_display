@@ -60,7 +60,7 @@ const ProfileInfo = {
                 icon: '📅'
             }
         ];
-
+        
         // Add email if available in attrs
         if (attrs.email) {
             infoCards.push({

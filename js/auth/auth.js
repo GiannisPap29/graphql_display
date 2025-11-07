@@ -114,7 +114,7 @@ const Auth = {
                 };
             }
 
-            // Save to localStorage
+            // Save to cookies
             Storage.saveToken(token);
             Storage.saveUserId(userId);
             Storage.saveUsername(username);
@@ -149,7 +149,7 @@ const Auth = {
         this.stopTokenExpiryCheck();
         
         // Clear all stored data
-        Storage.clearAll();
+        Storage.clear();
         
         // Redirect to login page
         window.location.href = 'login.html';
@@ -169,7 +169,7 @@ const Auth = {
         // Check if token is valid and not expired
         if (!JWT.isValid(token)) {
             // Token is invalid or expired, clear storage
-            Storage.clearAll();
+            Storage.clear();
             return false;
         }
 

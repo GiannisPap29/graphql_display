@@ -44,7 +44,7 @@ const Queries = {
                     type
                 }
             }
-        }
+        }   
     `,
 
     /**
