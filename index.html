@@ -92,30 +92,6 @@
                 `;
             }
 
-            /**
-             * Check if localStorage is available
-             * @returns {boolean} True if localStorage is available
-             */
-            function isLocalStorageAvailable() {
-                try {
-                    const test = '__localStorage_test__';
-                    localStorage.setItem(test, test);
-                    localStorage.removeItem(test);
-                    return true;
-                } catch (e) {
-                    return false;
-                }
-            }
-
-            // Check localStorage availability
-            if (!isLocalStorageAvailable()) {
-                showError(
-                    'Your browser does not support localStorage or it is disabled. Please enable localStorage to use this application.',
-                    'login.html'
-                );
-                return;
-            }
-
             // Initialize the redirect logic
             handleRedirect();
 

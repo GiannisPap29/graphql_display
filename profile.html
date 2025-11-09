@@ -218,11 +218,6 @@
 
             // Track current event filter
             let currentEvent = 'all';
-            let statsCache = {
-                event: null,
-                auditData: null,
-                passFailData: null
-            };
 
             // Get DOM elements
             const loadingState = document.getElementById('loadingState');
@@ -240,13 +235,8 @@
             /**
              * Handle event selection
              */
-            async function handleEventSelection(eventType) {
+            function handleEventSelection(eventType) {
                 currentEvent = eventType;
-                statsCache = {
-                    event: eventType,
-                    auditData: null,
-                    passFailData: null
-                };
                 
                 // Update UI
                 document.querySelectorAll('.event-card').forEach(card => {
@@ -257,8 +247,8 @@
                 // Reload data
                 const currentUser = Auth.getCurrentUser();
                 if (currentUser) {
-                    await loadStatistics(currentUser.userId);
-                    await loadGraphs(currentUser.userId);
+                    loadStatistics(currentUser.userId);
+                    loadGraphs(currentUser.userId);
                 }
             }
 
@@ -267,9 +257,9 @@
              */
             function initEventSelector() {
                 document.querySelectorAll('.event-card').forEach(card => {
-                    card.addEventListener('click', async () => {
+                    card.addEventListener('click', () => {
                         const eventType = card.getAttribute('data-event');
-                        await handleEventSelection(eventType);
+                        handleEventSelection(eventType);
                     });
                 });
             }
@@ -326,13 +316,6 @@
                     console.log('Loading statistics for user:', userId);
                     console.log('Current event:', currentEvent);
                     
-                    // Reset stats cache for this event
-                    statsCache = {
-                        event: currentEvent,
-                        auditData: null,
-                        passFailData: null
-                    };
-                    
                     // Get event-specific queries
                     const queries = getEventQueries(currentEvent, userId);
                     
@@ -345,17 +328,11 @@
                     console.log('Fetching audit ratio...');
                     const auditResult = await GraphQL.query(queries.auditRatio);
                     console.log('Audit result:', auditResult);
-                    if (auditResult.success) {
-                        statsCache.auditData = auditResult.data;
-                    }
                     
                     // Load pass/fail stats
                     console.log('Fetching pass/fail stats...');
                     const passFailResult = await GraphQL.query(queries.passFailStats);
                     console.log('Pass/fail result:', passFailResult);
-                    if (passFailResult.success) {
-                        statsCache.passFailData = passFailResult.data;
-                    }
 
                     // Render stats cards
                     if (window.StatsCard) {
@@ -387,51 +364,43 @@
                     // Get event-specific queries
                     const queries = getEventQueries(currentEvent, userId);
 
-                    // Fetch XP data once and reuse for all XP-based graphs
-                    if (window.XPTimeline || window.XPByProject) {
-                        console.log('Loading XP transactions for graphs...');
+                    // Load XP timeline
+                    if (window.XPTimeline) {
+                        console.log('Loading XP timeline...');
                         const xpData = await GraphQL.query(queries.xpTransactions);
-                        console.log('XP transactions data:', xpData);
-                        const xpTransactions = xpData.success ? (xpData.data?.transaction || []) : [];
-
-                        if (window.XPTimeline && xpData.success) {
-                            XPTimeline.render(xpTransactions);
-                        }
-
-                        if (window.XPByProject) {
-                            XPByProject.render(xpTransactions);
+                        console.log('XP timeline data:', xpData);
+                        if (xpData.success) {
+                            XPTimeline.render(xpData.data.transaction);
                         }
                     }
 
-                    // Load audit ratio (reuse cached data when available)
+                    // Load audit ratio
                     if (window.AuditRatio && queries.auditRatio) {
-                        const hasCachedAudit = statsCache.event === currentEvent && statsCache.auditData;
-                        if (hasCachedAudit) {
-                            console.log('Audit ratio data (cached):', { success: true, data: statsCache.auditData });
-                            AuditRatio.render(statsCache.auditData);
-                        } else {
-                            console.log('Loading audit ratio chart...');
-                            const auditData = await GraphQL.query(queries.auditRatio);
-                            console.log('Audit ratio data:', auditData);
-                            if (auditData.success) {
-                                AuditRatio.render(auditData.data);
-                            }
+                        console.log('Loading audit ratio chart...');
+                        const auditData = await GraphQL.query(queries.auditRatio);
+                        console.log('Audit ratio data:', auditData);
+                        if (auditData.success) {
+                            AuditRatio.render(auditData.data);
                         }
                     }
 
-                    // Load project stats (reuse cached data when available)
+                    // Load project stats
                     if (window.ProjectStats && queries.passFailStats) {
-                        const hasCachedPassFail = statsCache.event === currentEvent && statsCache.passFailData;
-                        if (hasCachedPassFail) {
-                            console.log('Project stats data (cached):', { success: true, data: statsCache.passFailData });
-                            ProjectStats.render(statsCache.passFailData);
-                        } else {
-                            console.log('Loading project stats...');
-                            const projectData = await GraphQL.query(queries.passFailStats);
-                            console.log('Project stats data:', projectData);
-                            if (projectData.success) {
-                                ProjectStats.render(projectData.data);
-                            }
+                        console.log('Loading project stats...');
+                        const projectData = await GraphQL.query(queries.passFailStats);
+                        console.log('Project stats data:', projectData);
+                        if (projectData.success) {
+                            ProjectStats.render(projectData.data);
+                        }
+                    }
+
+                    // Load XP by project (separate call for simplicity)
+                    if (window.XPByProject) {
+                        console.log('Loading XP by project...');
+                        const xpByProjectData = await GraphQL.query(queries.xpTransactions);
+                        console.log('XP by project data:', xpByProjectData);
+                        if (xpByProjectData.success) {
+                            XPByProject.render(xpByProjectData.data.transaction);
                         }
                     }
 
