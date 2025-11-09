@@ -4,6 +4,20 @@
  * OPTIMIZED: Contains only actively used queries
  */
 
+const XP_TRANSACTION_FIELDS = `
+                id
+                type
+                amount
+                createdAt
+                path
+                objectId
+                object {
+                    id
+                    name
+                    type
+                }
+            `;
+
 const Queries = {
     /**
      * Get user profile information
@@ -23,80 +37,50 @@ const Queries = {
     `,
 
     /**
-     * Get all XP transactions for the user
+     * Get XP transactions (optionally filtered by event)
      * Used in: profile.html (line 293) - XPTimeline graph
      */
-    getXPTransactions: `
-        query {
-            transaction(
-                where: { type: { _eq: "xp" } }
-                order_by: { createdAt: asc }
-            ) {
-                id
-                type
-                amount
-                createdAt
-                path
-                objectId
-                object {
-                    id
-                    name
-                    type
+    getXPTransactions(eventPath = null) {
+        const xpWhere = buildXPWhereClause(eventPath);
+        return `
+            query {
+                transaction(
+                    ${xpWhere}
+                    order_by: { createdAt: asc }
+                ) {
+                    ${XP_TRANSACTION_FIELDS}
                 }
             }
-        }   
-    `,
+        `;
+    },
 
     /**
-     * Get total XP amount
+     * Get total XP amount (optionally filtered by event)
      * Used in: profile.html (line 251) - Stats cards
      */
-    getTotalXP: `
-        query {
-            transaction_aggregate(where: { type: { _eq: "xp" } }) {
-                aggregate {
-                    sum {
-                        amount
+    getTotalXP(eventPath = null) {
+        const xpWhere = buildXPWhereClause(eventPath);
+        return `
+            query {
+                transaction_aggregate(
+                    ${xpWhere}
+                ) {
+                    aggregate {
+                        sum {
+                            amount
+                        }
+                        count
                     }
-                    count
                 }
             }
-        }
-    `,
+        `;
+    },
 
     /**
      * Get audit ratio (done vs received)
      * Used in: profile.html (lines 256, 303) - Stats cards & AuditRatio graph
      */
-    getAuditRatio: `
-        query($userId: Int!) {
-            auditorAudits: audit_aggregate(
-                where: { auditorId: { _eq: $userId } }
-            ) {
-                aggregate {
-                    count
-                }
-            }
-            receivedAudits: audit_aggregate(
-                where: { 
-                    group: { 
-                        members: { 
-                            userId: { _eq: $userId } 
-                        } 
-                    } 
-                }
-            ) {
-                aggregate {
-                    count
-                }
-            }
-        }
-    `,
-
-    /**
-     * Get audit ratio without variables (for "all" events)
-     */
-    getAuditRatioAll(userId) {
+    getAuditRatio(userId) {
         return `
             query {
                 auditorAudits: audit_aggregate(
@@ -124,55 +108,23 @@ const Queries = {
     },
 
     /**
-     * Get pass/fail statistics
+     * Get pass/fail statistics (optionally filtered by event)
      * Used in: profile.html (lines 261, 313) - Stats cards & ProjectStats graph
      */
-    getPassFailStats: `
-        query($userId: Int!) {
-            passed: result_aggregate(
-                where: { 
-                    userId: { _eq: $userId },
-                    grade: { _gte: 1 }
-                }
-            ) {
-                aggregate {
-                    count
-                }
-            }
-            failed: result_aggregate(
-                where: { 
-                    userId: { _eq: $userId },
-                    grade: { _lt: 1 }
-                }
-            ) {
-                aggregate {
-                    count
-                }
-            }
-        }
-    `,
-
-    /**
-     * Get pass/fail stats without variables (for "all" events)
-     */
-    getPassFailStatsAll(userId) {
+    getPassFailStats(userId, eventPath = null) {
+        const passedWhere = buildResultWhereClause(userId, 'grade: { _gte: 1 }', eventPath);
+        const failedWhere = buildResultWhereClause(userId, 'grade: { _lt: 1 }', eventPath);
         return `
             query {
                 passed: result_aggregate(
-                    where: { 
-                        userId: { _eq: ${userId} },
-                        grade: { _gte: 1 }
-                    }
+                    ${passedWhere}
                 ) {
                     aggregate {
                         count
                     }
                 }
                 failed: result_aggregate(
-                    where: { 
-                        userId: { _eq: ${userId} },
-                        grade: { _lt: 1 }
-                    }
+                    ${failedWhere}
                 ) {
                     aggregate {
                         count
@@ -182,180 +134,13 @@ const Queries = {
         `;
     },
 
-    /**
-     * Get XP by project type
-     * Used in: profile.html (line 323) - XPByProject graph
-     */
-    getXPByProject: `
-        query {
-            transaction(
-                where: { type: { _eq: "xp" } }
-            ) {
-                amount
-                object {
-                    name
-                    type
-                }
-            }
-        }
-    `,
-
-    /**
-     * Get XP by project filtered by event
-     * @param {string} eventPath - Path pattern for filtering (e.g., "/athens/piscine-go/%")
-     */
-    getXPByProjectByEvent(eventPath) {
-        return `
-            query {
-                transaction(
-                    where: { 
-                        type: { _eq: "xp" },
-                        path: { _like: "${eventPath}" }
-                    }
-                ) {
-                    amount
-                    path
-                    object {
-                        name
-                        type
-                    }
-                }
-            }
-        `;
-    },
-
-    // ========================================
-    // EVENT-SPECIFIC QUERIES
-    // ========================================
-
-    /**
-     * Get XP transactions filtered by event type
-     * @param {string} eventPath - Path pattern for filtering (e.g., "/athens/piscine-go/%")
-     */
-    getXPTransactionsByEvent(eventPath) {
-        return `
-            query {
-                transaction(
-                    where: { 
-                        type: { _eq: "xp" },
-                        path: { _like: "${eventPath}" }
-                    }
-                    order_by: { createdAt: asc }
-                ) {
-                    id
-                    type
-                    amount
-                    createdAt
-                    path
-                    objectId
-                    object {
-                        id
-                        name
-                        type
-                    }
-                }
-            }
-        `;
-    },
-
-    /**
-     * Get total XP for specific event
-     */
-    getTotalXPByEvent(eventPath) {
-        return `
-            query {
-                transaction_aggregate(
-                    where: { 
-                        type: { _eq: "xp" },
-                        path: { _like: "${eventPath}" }
-                    }
-                ) {
-                    aggregate {
-                        sum {
-                            amount
-                        }
-                        count
-                    }
-                }
-            }
-        `;
-    },
-
-    /**
-     * Get pass/fail stats for specific event
-     */
-    getPassFailStatsByEvent(userId, eventPath) {
-        return `
-            query {
-                passed: result_aggregate(
-                    where: { 
-                        userId: { _eq: ${userId} },
-                        grade: { _gte: 1 },
-                        path: { _like: "${eventPath}" }
-                    }
-                ) {
-                    aggregate {
-                        count
-                    }
-                }
-                failed: result_aggregate(
-                    where: { 
-                        userId: { _eq: ${userId} },
-                        grade: { _lt: 1 },
-                        path: { _like: "${eventPath}" }
-                    }
-                ) {
-                    aggregate {
-                        count
-                    }
-                }
-            }
-        `;
-    },
-
-    /**
-     * Get audit ratio for specific event
-     */
-    /**
-     * Get audit ratio for specific event
-     * NOTE: Audit records don't expose path information in the schema,
-     * so we fall back to global counts to avoid query errors.
-     */
-    getAuditRatioByEvent(userId, eventPath) { // eventPath kept for API consistency
-        return `
-            query {
-                auditorAudits: audit_aggregate(
-                    where: { 
-                        auditorId: { _eq: ${userId} }
-                    }
-                ) {
-                    aggregate {
-                        count
-                    }
-                }
-                receivedAudits: audit_aggregate(
-                    where: { 
-                        group: { 
-                            members: { 
-                                userId: { _eq: ${userId} } 
-                            }
-                        }
-                    }
-                ) {
-                    aggregate {
-                        count
-                    }
-                }
-            }
-        `;
-    }
 };
 
 /**
  * Event path patterns for filtering
  */
 const EventPaths = {
-    ALL: '%',                                    // All events
+    ALL: null,                                    // All events (no path filter)
     PISCINE_GO: '/athens/piscine-go/%',         // Piscine Go
     PISCINE_JS: '/athens/div-01/piscine-js/%',  // Piscine JS
     MODULE: '/athens/div-01/%',                  // Div-01 Module (includes piscine-js)
@@ -375,29 +160,49 @@ const getEventQueries = (eventType, userId = null) => {
         'module': EventPaths.MODULE
     };
 
-    const eventPath = pathMap[eventType] || EventPaths.ALL;
+    const eventPath = Object.prototype.hasOwnProperty.call(pathMap, eventType)
+        ? pathMap[eventType]
+        : EventPaths.ALL;
 
-    // For "all" events, use the non-variable versions
-    if (eventType === 'all') {
-        return {
-            xpTransactions: Queries.getXPTransactions,
-            totalXP: Queries.getTotalXP,
-            passFailStats: userId ? Queries.getPassFailStatsAll(userId) : null,
-            xpByProject: Queries.getXPByProject,
-            auditRatio: userId ? Queries.getAuditRatioAll(userId) : null
-        };
-    }
-
-    // For specific events, use filtered queries
     return {
-        xpTransactions: Queries.getXPTransactionsByEvent(eventPath),
-        totalXP: Queries.getTotalXPByEvent(eventPath),
-        passFailStats: userId ? Queries.getPassFailStatsByEvent(userId, eventPath) : null,
-        xpByProject: Queries.getXPByProjectByEvent(eventPath),
-        auditRatio: userId ? Queries.getAuditRatioByEvent(userId, eventPath) : null
+        xpTransactions: Queries.getXPTransactions(eventPath),
+        totalXP: Queries.getTotalXP(eventPath),
+        passFailStats: userId ? Queries.getPassFailStats(userId, eventPath) : null,
+        auditRatio: userId ? Queries.getAuditRatio(userId) : null
     };
 };
 
 // Freeze the Queries object to prevent modifications
 Object.freeze(Queries);
 Object.freeze(EventPaths);
+
+/**
+ * Helper: build XP transaction where clause with optional path filter
+ * @param {string|null} eventPath
+ * @returns {string}
+ */
+function buildXPWhereClause(eventPath) {
+    const filters = ['type: { _eq: "xp" }'];
+    if (eventPath) {
+        filters.push(`path: { _like: "${eventPath}" }`);
+    }
+    return `where: { ${filters.join(', ')} }`;
+}
+
+/**
+ * Helper: build result aggregate where clause with optional path filter
+ * @param {number} userId
+ * @param {string} gradeFilter
+ * @param {string|null} eventPath
+ * @returns {string}
+ */
+function buildResultWhereClause(userId, gradeFilter, eventPath) {
+    const filters = [
+        `userId: { _eq: ${userId} }`,
+        gradeFilter
+    ];
+    if (eventPath) {
+        filters.push(`path: { _like: "${eventPath}" }`);
+    }
+    return `where: { ${filters.join(', ')} }`;
+}
