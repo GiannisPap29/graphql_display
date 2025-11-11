@@ -15,7 +15,10 @@ const CONFIG = {
         USERNAME: 'username'
     },
   
-   USE_CORS_PROXY: true,
+    USE_CORS_PROXY:
+        window.location.hostname === 'localhost' ||
+        window.location.hostname === '127.0.0.1' ||
+        window.location.hostname === 'giannispap29.github.io',
 
     CORS_PROXY: 'https://corsproxy.io/?',
     CORS_PROXY_ENCODE_URI: true,
