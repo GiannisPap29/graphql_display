@@ -5,18 +5,13 @@
  */
 
 const XP_TRANSACTION_FIELDS = `
-                id
-                type
-                amount
-                createdAt
-                path
-                objectId
-                object {
-                    id
-                    name
-                    type
-                }
-            `;
+    amount
+    createdAt
+    path
+    object {
+        name
+    }
+`;
 
 const Queries = {
     /**

@@ -6,13 +6,13 @@ const XPTimeline = {
         SVGBuilder.clearContainer(container);
 
         if (!transactions || transactions.length === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📊', 'No XP Data', 'Complete projects to see progress!');
             return;
         }
 
         const data = DataProcessor.processXPTimeline(transactions);
         if (data.length === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📊', 'No XP Data', 'Complete projects to see progress!');
             return;
         }
 
@@ -108,10 +108,6 @@ const XPTimeline = {
     hideTooltip() {
         const t = document.getElementById('xp-tooltip');
         if (t) SVGBuilder.hideTooltip(t);
-    },
-
-    showEmptyState(c) {
-        c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><h3>No XP Data</h3><p>Complete projects to see progress!</p></div>';
     }
 };
 

@@ -15,7 +15,9 @@ const CONFIG = {
         USERNAME: 'username'
     },
   
-    USE_CORS_PROXY: true,  // Use external CORS proxy
+    USE_CORS_PROXY: window.location.hostname === 'localhost' || 
+                window.location.hostname === '127.0.0.1',
+
     CORS_PROXY: 'https://corsproxy.io/?',
     CORS_PROXY_ENCODE_URI: true,
     CORS_PROXY_HEADERS: {},

@@ -9,7 +9,7 @@ const AuditRatio = {
         const auditsReceived = data?.receivedAudits?.aggregate?.count || 0;
 
         if (auditsDone === 0 && auditsReceived === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📊', 'No Audit Data', 'Complete audits to see your ratio!');
             return;
         }
 
@@ -114,10 +114,6 @@ const AuditRatio = {
     hideTooltip() {
         const t = document.getElementById('audit-ratio-tooltip');
         if (t) SVGBuilder.hideTooltip(t);
-    },
-
-    showEmptyState(c) {
-        c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><h3>No Audit Data</h3><p>Complete audits to see your ratio!</p></div>';
     }
 };
 

@@ -9,7 +9,7 @@ const ProjectStats = {
         const failed = data?.failed?.aggregate?.count || 0;
 
         if (passed === 0 && failed === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📈', 'No Project Data', 'Complete projects to see stats!');
             return;
         }
 
@@ -130,10 +130,6 @@ const ProjectStats = {
     hideTooltip() {
         const t = document.getElementById('project-stats-tooltip');
         if (t) SVGBuilder.hideTooltip(t);
-    },
-
-    showEmptyState(c) {
-        c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📈</div><h3>No Project Data</h3><p>Complete projects to see stats!</p></div>';
     }
 };
 

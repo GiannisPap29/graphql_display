@@ -162,54 +162,8 @@ const Storage = {
     isAuthenticated() {
         const token = this.getToken();
         return !!token;
-    },
-
-    /**
-     * Migration utility: Move data from localStorage to cookies
-     * Call this once to migrate existing users
-     */
-    migrateFromLocalStorage() {
-        try {
-            // Check if localStorage has old data
-            const oldToken = localStorage.getItem('jwt_token');
-            const oldUserId = localStorage.getItem('user_id');
-            const oldUsername = localStorage.getItem('username');
-
-            if (oldToken) {
-                this.saveToken(oldToken);
-                console.log('✅ Migrated JWT token to cookie');
-            }
-
-            if (oldUserId) {
-                this.saveUserId(parseInt(oldUserId, 10));
-                console.log('✅ Migrated user ID to cookie');
-            }
-
-            if (oldUsername) {
-                this.saveUsername(oldUsername);
-                console.log('✅ Migrated username to cookie');
-            }
-
-            // Clean up localStorage
-            if (oldToken || oldUserId || oldUsername) {
-                localStorage.removeItem('jwt_token');
-                localStorage.removeItem('user_id');
-                localStorage.removeItem('username');
-                console.log('✅ Cleaned up localStorage');
-            }
-
-            return true;
-        } catch (error) {
-            console.error('Error migrating from localStorage:', error);
-            return false;
-        }
     }
 };
-
-// Auto-migrate on first load (only runs once if localStorage has data)
-if (typeof window !== 'undefined') {
-    Storage.migrateFromLocalStorage();
-}
 
 // Expose to window
 window.Storage = Storage;

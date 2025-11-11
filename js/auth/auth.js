@@ -8,7 +8,7 @@ const Auth = {
      * Login with credentials
      * @param {string} identifier - Username or email
      * @param {string} password - User password
-     * @returns {Promise<object>} Response object with success status and data
+     * @returns {Promise<object>} Response object with success status and data/error
      */
     async login(identifier, password) {
         try {
@@ -268,21 +268,6 @@ const Auth = {
             'Authorization': `${CONFIG.AUTH_HEADER_PREFIX} ${token}`,
             'Content-Type': 'application/json'
         };
-    },
-
-    /**
-     * Refresh token validity check
-     * @returns {boolean} True if token is still valid
-     */
-    refreshTokenCheck() {
-        const token = Storage.getToken();
-        
-        if (!token || !JWT.isValid(token)) {
-            this.logout();
-            return false;
-        }
-
-        return true;
     }
 };
 

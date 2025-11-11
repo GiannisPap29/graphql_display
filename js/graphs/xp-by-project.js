@@ -6,13 +6,13 @@ const XPByProject = {
         SVGBuilder.clearContainer(container);
 
         if (!transactions || transactions.length === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📊', 'No Project Data', 'Complete projects to see XP distribution!');
             return;
         }
 
         const top = DataProcessor.getTopProjects(transactions, 10);
         if (top.length === 0) {
-            this.showEmptyState(container);
+            SVGBuilder.showEmptyState(container, '📊', 'No Project Data', 'Complete projects to see XP distribution!');
             return;
         }
 
@@ -98,10 +98,6 @@ const XPByProject = {
     hideTooltip() {
         const t = document.getElementById('xp-project-tooltip');
         if (t) SVGBuilder.hideTooltip(t);
-    },
-
-    showEmptyState(c) {
-        c.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📊</div><h3>No Project Data</h3><p>Complete projects to see XP distribution!</p></div>';
     }
 };
 

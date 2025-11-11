@@ -60,7 +60,6 @@ const SVGBuilder = {
         line.setAttribute('x2', x2);
         line.setAttribute('y2', y2);
 
-        // Default styles
         const defaultStyles = {
             stroke: '#e2e8f0',
             'stroke-width': 1
@@ -146,7 +145,6 @@ const SVGBuilder = {
         const pointsString = points.map(p => `${p.x},${p.y}`).join(' ');
         polyline.setAttribute('points', pointsString);
 
-        // Default styles
         const defaultStyles = {
             fill: 'none',
             stroke: '#667eea',
@@ -175,7 +173,6 @@ const SVGBuilder = {
         textEl.setAttribute('x', x);
         textEl.setAttribute('y', y);
 
-        // Default styles
         const defaultStyles = {
             'font-size': '12',
             'font-family': 'sans-serif',
@@ -188,55 +185,6 @@ const SVGBuilder = {
         });
 
         return textEl;
-    },
-
-    /**
-     * Create a linear gradient
-     * @param {string} id - Gradient ID
-     * @param {Array} stops - Array of {offset, color} objects
-     * @param {string} direction - 'vertical' or 'horizontal'
-     * @returns {SVGElement} Gradient element
-     */
-    createLinearGradient(id, stops, direction = 'vertical') {
-        const gradient = document.createElementNS('http://www.w3.org/2000/svg', 'linearGradient');
-        gradient.setAttribute('id', id);
-
-        if (direction === 'horizontal') {
-            gradient.setAttribute('x1', '0%');
-            gradient.setAttribute('y1', '0%');
-            gradient.setAttribute('x2', '100%');
-            gradient.setAttribute('y2', '0%');
-        } else {
-            gradient.setAttribute('x1', '0%');
-            gradient.setAttribute('y1', '0%');
-            gradient.setAttribute('x2', '0%');
-            gradient.setAttribute('y2', '100%');
-        }
-
-        stops.forEach(stop => {
-            const stopEl = document.createElementNS('http://www.w3.org/2000/svg', 'stop');
-            stopEl.setAttribute('offset', stop.offset);
-            stopEl.setAttribute('stop-color', stop.color);
-            if (stop.opacity !== undefined) {
-                stopEl.setAttribute('stop-opacity', stop.opacity);
-            }
-            gradient.appendChild(stopEl);
-        });
-
-        return gradient;
-    },
-
-    /**
-     * Create definitions element with gradients
-     * @param {Array} gradients - Array of gradient elements
-     * @returns {SVGElement} Defs element
-     */
-    createDefs(gradients = []) {
-        const defs = document.createElementNS('http://www.w3.org/2000/svg', 'defs');
-        gradients.forEach(gradient => {
-            defs.appendChild(gradient);
-        });
-        return defs;
     },
 
     /**
@@ -287,23 +235,20 @@ const SVGBuilder = {
     },
 
     /**
-     * Calculate scale for data
-     * @param {Array} data - Array of numbers
-     * @param {number} max - Maximum value for scale
-     * @returns {object} {min, max, scale}
+     * Show empty state in container
+     * @param {HTMLElement} container - Container element
+     * @param {string} icon - Emoji icon
+     * @param {string} title - Title text
+     * @param {string} message - Message text
      */
-    calculateScale(data, max) {
-        const dataMin = Math.min(...data);
-        const dataMax = Math.max(...data);
-        const range = dataMax - dataMin;
-        const scale = max / (range || 1);
-
-        return {
-            min: dataMin,
-            max: dataMax,
-            range,
-            scale
-        };
+    showEmptyState(container, icon = '📊', title = 'No Data', message = 'No data available to display') {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">${icon}</div>
+                <h3>${title}</h3>
+                <p>${message}</p>
+            </div>
+        `;
     },
 
     /**
@@ -328,48 +273,6 @@ const SVGBuilder = {
     },
 
     /**
-     * Generate color palette
-     * @param {number} count - Number of colors
-     * @param {string} scheme - Color scheme: 'default', 'blue', 'green', 'rainbow'
-     * @returns {Array} Array of color strings
-     */
-    generateColorPalette(count, scheme = 'default') {
-        const schemes = {
-            default: ['#667eea', '#764ba2', '#f093fb', '#4facfe'],
-            blue: ['#667eea', '#4299e1', '#3182ce', '#2c5282'],
-            green: ['#48bb78', '#38a169', '#2f855a', '#276749'],
-            rainbow: ['#f56565', '#ed8936', '#ecc94b', '#48bb78', '#4299e1', '#667eea', '#9f7aea']
-        };
-
-        const colors = schemes[scheme] || schemes.default;
-        const result = [];
-
-        for (let i = 0; i < count; i++) {
-            result.push(colors[i % colors.length]);
-        }
-
-        return result;
-    },
-
-    /**
-     * Add animation to element
-     * @param {SVGElement} element - SVG element
-     * @param {string} property - Property to animate
-     * @param {string} from - Start value
-     * @param {string} to - End value
-     * @param {number} duration - Duration in ms
-     */
-    animate(element, property, from, to, duration = 500) {
-        const animate = document.createElementNS('http://www.w3.org/2000/svg', 'animate');
-        animate.setAttribute('attributeName', property);
-        animate.setAttribute('from', from);
-        animate.setAttribute('to', to);
-        animate.setAttribute('dur', `${duration}ms`);
-        animate.setAttribute('fill', 'freeze');
-        element.appendChild(animate);
-    },
-
-    /**
      * Clear SVG container
      * @param {HTMLElement} container - Container element
      */
@@ -377,21 +280,6 @@ const SVGBuilder = {
         while (container.firstChild) {
             container.removeChild(container.firstChild);
         }
-    },
-
-    /**
-     * Create responsive SVG wrapper
-     * @param {number} aspectRatio - Aspect ratio (width/height)
-     * @returns {HTMLElement} Wrapper div
-     */
-    createResponsiveWrapper(aspectRatio = 16/9) {
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = `
-            position: relative;
-            width: 100%;
-            padding-bottom: ${(1 / aspectRatio) * 100}%;
-        `;
-        return wrapper;
     }
 };
 
