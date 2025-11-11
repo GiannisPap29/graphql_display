@@ -55,30 +55,14 @@ A dynamic, interactive profile page that visualizes your Zone01 learning journey
 4. **Access** the application:
    - Open your browser and go to: `http://localhost:8000`
 
-### Option 2: Deploy to GitHub Pages
 
-1. **Push** your code to a GitHub repository
 
-2. **Enable GitHub Pages**:
-   - Go to repository Settings → Pages
-   - Source: Select `main` branch
-   - Click Save
-
-3. **Access** your profile at:
+### Github online page ###
    ```
-   https://your-username.github.io/repository-name/
+   https://giannispap29.github.io/graphql_display/profile.html
    ```
 
-### Option 3: Deploy to Netlify
 
-1. **Drag and drop** your project folder to [Netlify Drop](https://app.netlify.com/drop)
-
-2. **Or connect** your GitHub repository:
-   - Sign up at [Netlify](https://www.netlify.com/)
-   - Click "New site from Git"
-   - Select your repository
-   - Build settings: Leave default (none needed)
-   - Click "Deploy site"
 
 ## 🔑 How to Use
 

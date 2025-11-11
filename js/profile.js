@@ -123,7 +123,7 @@
             console.error('Error loading statistics:', error);
         }
     }
-
+    
     /**
      * Load all graphs
      */
@@ -180,7 +180,7 @@
     function showLoading() {
         loadingState.style.display = 'flex';
         errorState.style.display = 'none';
-        profileContent.style.display = 'none';
+        profileContent.style.display = 'flex';
     }
 
     function showError(message) {

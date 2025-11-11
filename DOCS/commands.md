@@ -11,4 +11,4 @@ python3 -m http.server 8000
 
 link for github : 
 
-https://giannispap29.github.io/graphql_display/login.html
+    https://giannispap29.github.io/graphql_display/profile.html
